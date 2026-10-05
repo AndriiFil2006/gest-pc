@@ -8,6 +8,7 @@ from mediapipe.tasks.python import vision
 
 from landmarks import Landmark, TRACKED_POINTS
 from gestures import is_pointing
+from cursor_control import move_cursor
 
 
 BaseOptions = python.BaseOptions
@@ -86,7 +87,6 @@ with HandLandmarker.create_from_options(options) as landmarker:
                         1
                     )
 
-                # Check pointing gesture
                 if is_pointing(hand):
                     cv2.putText(
                         frame,
@@ -98,11 +98,16 @@ with HandLandmarker.create_from_options(options) as landmarker:
                         2
                     )
 
-                    # Get index fingertip coordinates
                     index_tip = hand[
                         Landmark.INDEX_FINGER_TIP
                     ]
 
+                    # Move actual mouse cursor
+                    move_cursor(
+                        index_tip.x,
+                        index_tip.y
+                    )
+                    # Draw fingertip marker
                     cursor_x = int(
                         index_tip.x * width
                     )
