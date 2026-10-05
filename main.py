@@ -32,6 +32,8 @@ with HandLandmarker.create_from_options(options) as landmarker:
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
+    previous_time = time.time()
+
     while cap.isOpened():
         success, frame = cap.read()
 
@@ -123,6 +125,27 @@ with HandLandmarker.create_from_options(options) as landmarker:
                         (0, 255, 0),
                         2
                     )
+
+        current_time = time.time()
+
+        delta_time = current_time - previous_time
+
+        if delta_time > 0:
+            fps = 1 / delta_time
+        else:
+            fps = 0
+
+        previous_time = current_time
+
+        cv2.putText(
+            frame,
+            f"FPS: {fps:.1f}",
+            (20, 80),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.7,
+            (255, 255, 255),
+            2
+        )
 
         cv2.imshow(
             "MediaPipe Hands",
