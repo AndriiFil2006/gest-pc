@@ -1,5 +1,5 @@
-from landmarks import Landmark
-from hand_utils import finger_extended
+from gesture_pc.vision.landmarks import Landmark
+from gesture_pc.vision.hand_utils import finger_extended
 
 
 def is_pointing(hand):

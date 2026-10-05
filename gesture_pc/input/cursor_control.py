@@ -7,13 +7,12 @@ import time
 
 SYSTEM = platform.system()
 
-SMOOTHING_SPEED = 5
-
-from config import (
+from gesture_pc.config import (
     ACTIVE_LEFT,
     ACTIVE_RIGHT,
     ACTIVE_TOP,
     ACTIVE_BOTTOM,
+    SMOOTHING_SPEED,
 )
 
 

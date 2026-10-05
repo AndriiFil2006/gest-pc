@@ -6,11 +6,11 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-from landmarks import Landmark, TRACKED_POINTS
-from gestures import is_pointing
-from cursor_control import move_cursor
+from gesture_pc.vision.landmarks import Landmark, TRACKED_POINTS
+from gesture_pc.vision.gestures import is_pointing
+from gesture_pc.input.cursor_control import move_cursor
 
-from config import (
+from gesture_pc.config import (
     ACTIVE_LEFT,
     ACTIVE_RIGHT,
     ACTIVE_TOP,
@@ -25,7 +25,7 @@ VisionRunningMode = vision.RunningMode
 
 options = HandLandmarkerOptions(
     base_options=BaseOptions(
-        model_asset_path="hand_landmarker.task"
+        model_asset_path="models/hand_landmarker.task"
     ),
     running_mode=VisionRunningMode.VIDEO,
     num_hands=1,
@@ -35,8 +35,8 @@ options = HandLandmarkerOptions(
 with HandLandmarker.create_from_options(options) as landmarker:
     cap = cv2.VideoCapture(2)
 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     previous_time = time.time()
 

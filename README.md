@@ -73,7 +73,7 @@ Handles:
 - cursor movement calls
 - displaying the webcam feed
 
-### `gestures.py`
+### `gesture_pc/vision/gestures.py`
 
 Contains gesture-recognition logic such as:
 
@@ -88,14 +88,14 @@ The pointing gesture currently requires:
 - ring finger folded
 - pinky finger folded
 
-### `hand_utils.py`
+### `gesture_pc/vision/hand_utils.py`
 
 Contains reusable hand-analysis functions such as:
 
 - calculating finger joint angles
 - determining whether a finger is extended
 
-### `landmarks.py`
+### `gesture_pc/vision/landmarks.py`
 
 Defines MediaPipe hand landmark IDs using an enum.
 
@@ -107,7 +107,7 @@ Landmark.INDEX_FINGER_PIP
 Landmark.WRIST
 ```
 
-### `cursor_control.py`
+### `gesture_pc/input/cursor_control.py`
 
 Handles operating-system-specific cursor movement.
 
