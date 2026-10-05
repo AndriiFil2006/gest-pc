@@ -1,34 +1,66 @@
 import math
 
 
-def distance(a, b):
-    return math.sqrt(
-        (a.x - b.x) ** 2 +
-        (a.y - b.y) ** 2
+def finger_angle(a, b, c):
+    """
+    Returns angle ABC in degrees using x, y, and z.
+    b is the joint in the middle.
+    """
+
+    ba = (
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z
     )
 
-
-def finger_angle(mcp, pip, dip):
-    v1 = (
-        mcp.x - pip.x,
-        mcp.y - pip.y
-    )
-
-    v2 = (
-        dip.x - pip.x,
-        dip.y - pip.y
+    bc = (
+        c.x - b.x,
+        c.y - b.y,
+        c.z - b.z
     )
 
     dot = (
-        v1[0] * v2[0] +
-        v1[1] * v2[1]
+        ba[0] * bc[0] +
+        ba[1] * bc[1] +
+        ba[2] * bc[2]
     )
 
-    mag1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2)
-    mag2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2)
+    mag_ba = math.sqrt(
+        ba[0] ** 2 +
+        ba[1] ** 2 +
+        ba[2] ** 2
+    )
 
-    cos_angle = dot / (mag1 * mag2)
+    mag_bc = math.sqrt(
+        bc[0] ** 2 +
+        bc[1] ** 2 +
+        bc[2] ** 2
+    )
+
+    if mag_ba == 0 or mag_bc == 0:
+        return 0
+
+    cos_angle = dot / (mag_ba * mag_bc)
 
     cos_angle = max(-1, min(1, cos_angle))
 
     return math.degrees(math.acos(cos_angle))
+
+
+def finger_extended(hand, mcp, pip, dip, tip):
+    pip_angle = finger_angle(
+        hand[mcp],
+        hand[pip],
+        hand[dip]
+    )
+
+    dip_angle = finger_angle(
+        hand[pip],
+        hand[dip],
+        hand[tip]
+    )
+
+    return (
+        pip_angle > 160
+        and dip_angle > 160
+    )

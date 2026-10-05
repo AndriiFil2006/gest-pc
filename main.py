@@ -7,7 +7,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 from landmarks import Landmark, TRACKED_POINTS
-from hand_utils import finger_angle
+from gestures import is_pointing
 
 
 BaseOptions = python.BaseOptions
@@ -37,14 +37,19 @@ with HandLandmarker.create_from_options(options) as landmarker:
         if not success:
             break
 
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        rgb_frame = cv2.cvtColor(
+            frame,
+            cv2.COLOR_BGR2RGB
+        )
 
         mp_image = mp.Image(
             image_format=mp.ImageFormat.SRGB,
             data=rgb_frame
         )
 
-        timestamp_ms = int(time.monotonic() * 1000)
+        timestamp_ms = int(
+            time.monotonic() * 1000
+        )
 
         result = landmarker.detect_for_video(
             mp_image,
@@ -56,7 +61,7 @@ with HandLandmarker.create_from_options(options) as landmarker:
 
             for hand in result.hand_landmarks:
 
-                # Draw the landmarks you're currently interested in
+                # Draw tracked landmarks
                 for name, landmark_id in TRACKED_POINTS.items():
                     landmark = hand[landmark_id]
 
@@ -81,40 +86,43 @@ with HandLandmarker.create_from_options(options) as landmarker:
                         1
                     )
 
-                # Calculate finger angles
-                index_angle = finger_angle(
-                    hand[Landmark.INDEX_FINGER_MCP],
-                    hand[Landmark.INDEX_FINGER_PIP],
-                    hand[Landmark.INDEX_FINGER_DIP]
-                )
+                # Check pointing gesture
+                if is_pointing(hand):
+                    cv2.putText(
+                        frame,
+                        "POINTING",
+                        (20, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1,
+                        (0, 255, 0),
+                        2
+                    )
 
-                middle_angle = finger_angle(
-                    hand[Landmark.MIDDLE_FINGER_MCP],
-                    hand[Landmark.MIDDLE_FINGER_PIP],
-                    hand[Landmark.MIDDLE_FINGER_DIP]
-                )
+                    # Get index fingertip coordinates
+                    index_tip = hand[
+                        Landmark.INDEX_FINGER_TIP
+                    ]
 
-                ring_angle = finger_angle(
-                    hand[Landmark.RING_FINGER_MCP],
-                    hand[Landmark.RING_FINGER_PIP],
-                    hand[Landmark.RING_FINGER_DIP]
-                )
+                    cursor_x = int(
+                        index_tip.x * width
+                    )
 
-                pinky_angle = finger_angle(
-                    hand[Landmark.PINKY_MCP],
-                    hand[Landmark.PINKY_PIP],
-                    hand[Landmark.PINKY_DIP]
-                )
+                    cursor_y = int(
+                        index_tip.y * height
+                    )
 
-                # Temporary debugging
-                print(
-                    f"Index: {index_angle:.1f} | "
-                    f"Middle: {middle_angle:.1f} | "
-                    f"Ring: {ring_angle:.1f} | "
-                    f"Pinky: {pinky_angle:.1f}"
-                )
+                    cv2.circle(
+                        frame,
+                        (cursor_x, cursor_y),
+                        12,
+                        (0, 255, 0),
+                        2
+                    )
 
-        cv2.imshow("MediaPipe Hands", frame)
+        cv2.imshow(
+            "MediaPipe Hands",
+            frame
+        )
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
