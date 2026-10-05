@@ -7,7 +7,15 @@ import time
 
 SYSTEM = platform.system()
 
-SMOOTHING_SPEED = 10.0
+SMOOTHING_SPEED = 5
+
+from config import (
+    ACTIVE_LEFT,
+    ACTIVE_RIGHT,
+    ACTIVE_TOP,
+    ACTIVE_BOTTOM,
+)
+
 
 def get_screen_size():
     root = tk.Tk()
@@ -80,9 +88,38 @@ if (
 def move_cursor(x, y):
     global current_x, current_y, last_update_time
 
-    target_x = int((1 - x) * SCREEN_WIDTH)
+    # Keep landmark inside active region
+    x = max(
+        ACTIVE_LEFT,
+        min(ACTIVE_RIGHT, x)
+    )
 
-    target_y = int(y * SCREEN_HEIGHT)
+    y = max(
+        ACTIVE_TOP,
+        min(ACTIVE_BOTTOM, y)
+    )
+
+    # Remap active region to 0.0 -> 1.0
+    normalized_x = (
+        x - ACTIVE_LEFT
+    ) / (
+        ACTIVE_RIGHT - ACTIVE_LEFT
+    )
+
+    normalized_y = (
+        y - ACTIVE_TOP
+    ) / (
+        ACTIVE_BOTTOM - ACTIVE_TOP
+    )
+
+    # Map to screen
+    target_x = int(
+        (1 - normalized_x) * SCREEN_WIDTH
+    )
+
+    target_y = int(
+        normalized_y * SCREEN_HEIGHT
+    )
 
     target_x = max(
         0,
@@ -94,16 +131,24 @@ def move_cursor(x, y):
         min(SCREEN_HEIGHT - 1, target_y)
     )
 
+    # Time-based smoothing
     now = time.monotonic()
 
     delta_time = now - last_update_time
     last_update_time = now
 
-    alpha = 1 - pow(2.71828, -SMOOTHING_SPEED * delta_time)
+    alpha = 1 - pow(
+        2.71828,
+        -SMOOTHING_SPEED * delta_time
+    )
 
-    current_x += (target_x - current_x) * alpha
+    current_x += (
+        target_x - current_x
+    ) * alpha
 
-    current_y += (target_y - current_y) * alpha
+    current_y += (
+        target_y - current_y
+    ) * alpha
 
     screen_x = int(current_x)
     screen_y = int(current_y)
@@ -118,9 +163,9 @@ def move_cursor(x, y):
         _move_linux(screen_x, screen_y)
 
     else:
-        raise RuntimeError(f"Unsupported operating system: {SYSTEM}")
-
-
+        raise RuntimeError(
+            f"Unsupported operating system: {SYSTEM}"
+        )
 
 def _move_windows(x, y):
     import ctypes

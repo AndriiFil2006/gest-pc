@@ -10,6 +10,12 @@ from landmarks import Landmark, TRACKED_POINTS
 from gestures import is_pointing
 from cursor_control import move_cursor
 
+from config import (
+    ACTIVE_LEFT,
+    ACTIVE_RIGHT,
+    ACTIVE_TOP,
+    ACTIVE_BOTTOM,
+)
 
 BaseOptions = python.BaseOptions
 HandLandmarker = vision.HandLandmarker
@@ -59,9 +65,32 @@ with HandLandmarker.create_from_options(options) as landmarker:
             timestamp_ms
         )
 
-        if result.hand_landmarks:
-            height, width, _ = frame.shape
+        height, width, _ = frame.shape
 
+        active_left_px = int(ACTIVE_LEFT * width)
+        active_right_px = int(ACTIVE_RIGHT * width)
+        active_top_px = int(ACTIVE_TOP * height)
+        active_bottom_px = int(ACTIVE_BOTTOM * height)
+
+        cv2.rectangle(
+            frame,
+            (active_left_px, active_top_px),
+            (active_right_px, active_bottom_px),
+            (255, 255, 0),
+            2
+        )
+
+        cv2.putText(
+            frame,
+            "ACTIVE AREA",
+            (active_left_px, active_top_px - 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (255, 255, 0),
+            2
+        )
+
+        if result.hand_landmarks:
             for hand in result.hand_landmarks:
 
                 # Draw tracked landmarks
